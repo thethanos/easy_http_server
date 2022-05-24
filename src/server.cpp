@@ -1,0 +1,48 @@
+#include "server.hpp"
+
+server::server(uint16_t port, size_t thread_count):thread_count(thread_count)
+{ 
+    acceptor_ptr = std::make_shared<tcp::acceptor>(context);
+
+    tcp::endpoint endpoint(tcp::v4(), port);
+    acceptor_ptr->open(endpoint.protocol());
+    acceptor_ptr->bind(endpoint);
+}
+
+void server::handle(http::verb verb, const std::string& path, std::function<void(const req_type&, resp_type&)> handle_func)
+{
+    if (!router_ptr)
+        router_ptr = std::make_shared<default_router>();
+
+    router_ptr->register_handler(verb, path, handle_func);
+}
+
+void server::set_router(std::shared_ptr<abstract_router>& router_ptr)
+{
+	this->router_ptr = router_ptr;
+}
+
+void server::listen_and_serve()
+{
+    acceptor_ptr->listen();
+    
+    acceptor_ptr->async_accept(socket, [&](std::error_code error) {
+      if (!error)
+        std::make_shared<http_connection>(std::move(socket), router_ptr)->start();
+      accept_next(acceptor_ptr, socket);
+    });
+
+    for (size_t i(0); i < thread_count; ++i)
+      boost::asio::post(threads, [this](){ this->context.run();});
+
+    threads.join();
+}
+
+void server::accept_next(std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket)
+{
+    acceptor_ptr->async_accept(socket, [&](std::error_code error) {
+      if (!error)
+        std::make_shared<http_connection>(std::move(socket), router_ptr)->start();
+      accept_next(acceptor_ptr, socket);
+    });
+}
