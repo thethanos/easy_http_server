@@ -1,6 +1,3 @@
-# easy_http_server
-A small library that simplifies creation of http servers with C++ 
-
 ## Dependencies:
 > Boost (See Dockerfile for more information)
 
