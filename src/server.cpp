@@ -34,12 +34,7 @@ void server::set_router(std::shared_ptr<abstract_router>& router_ptr)
 void server::listen_and_serve()
 {
     acceptor_ptr->listen();
-    
-    acceptor_ptr->async_accept(socket, [&](beast::error_code error) {
-        if (!error)
-            std::make_shared<connection>(std::move(socket), router_ptr, deadline)->start();
-        accept_next(acceptor_ptr, socket);
-    });
+    accept_next(acceptor_ptr, socket);
 
     for (size_t i(0); i < thread_count; ++i)
         boost::asio::post(threads, [this](){ this->io_ctx.run();});
@@ -50,12 +45,7 @@ void server::listen_and_serve()
 void server::listen_and_serve_secure()
 {
     acceptor_ptr->listen();
-    
-    acceptor_ptr->async_accept(socket, [&](beast::error_code error) {
-        if (!error)
-            std::make_shared<connection_secure>(ssl_ctx, std::move(socket), router_ptr, deadline)->start();
-        accept_next_secure(acceptor_ptr, socket);
-    });
+    accept_next_secure(acceptor_ptr, socket);
 
     for (size_t i(0); i < thread_count; ++i)
         boost::asio::post(threads, [this](){ this->io_ctx.run(); });

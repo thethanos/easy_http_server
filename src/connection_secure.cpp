@@ -1,6 +1,6 @@
 #include "connection_secure.hpp"
 
-connection_secure::connection_secure(ssl::context& ssl_ctx, tcp::socket&& socket, std::shared_ptr<abstract_router> router_ptr, const int64_t deadline)
+connection_secure::connection_secure(ssl::context& ssl_ctx, tcp::socket&& socket, std::shared_ptr<abstract_router> router_ptr, const int64_t& deadline)
     :socket(std::move(socket), ssl_ctx), timer(socket.get_executor(), std::chrono::seconds(deadline)) 
 {
     this->router_ptr = router_ptr;
