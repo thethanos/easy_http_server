@@ -1,6 +1,5 @@
 ## Dependencies (See Dockerfile for more information):
-> Boost 
-> OpenSSL
+> Boost, OpenSSL
 
 ## Example (no TLS):
 ```
