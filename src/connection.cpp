@@ -1,6 +1,6 @@
 #include "connection.hpp"
 
-connection::connection(tcp::socket&& socket, std::shared_ptr<abstract_router> router_ptr, const int64_t& deadline)
+connection::connection(tcp::socket&& socket, std::shared_ptr<abstract_router> router_ptr, int64_t deadline)
     :socket(std::move(socket)), timer(socket.get_executor(), std::chrono::seconds(deadline))
 { 
     this->router_ptr = router_ptr; 

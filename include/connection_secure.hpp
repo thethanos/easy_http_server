@@ -14,7 +14,7 @@ using tcp = boost::asio::ip::tcp;
 class connection_secure : public std::enable_shared_from_this<connection_secure>
 {
 public:
-    connection_secure(ssl::context& ssl_ctx, tcp::socket&& socket, std::shared_ptr<abstract_router> router_ptr, const int64_t& deadline);
+    connection_secure(ssl::context& ssl_ctx, tcp::socket&& socket, std::shared_ptr<abstract_router> router_ptr, int64_t deadline);
 
 public:
     // start processing the connection
