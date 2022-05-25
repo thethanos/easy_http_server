@@ -8,21 +8,10 @@
 class Hanlder
 {
 public:
-  	Hanlder(){}
-
-public:
-  	void get(const req_type& request, resp_type& response)
-  	{
-		beast::ostream(response.body()) << data << '\n';
-  	}
-
-  	void post(const req_type& request, resp_type& response)
-  	{
-		data = beast::buffers_to_string(request.body().data());
-	}
-
+    void get(const req_type& request, resp_type& response) { beast::ostream(response.body()) << data << '\n'; }
+    void post(const req_type& request, resp_type& response) { data = beast::buffers_to_string(request.body().data()); }
 private:
-	std::string data;
+    std::string data;
 };
 
 int main(int argc, char* argv[])
@@ -45,21 +34,10 @@ int main(int argc, char* argv[])
 class Hanlder
 {
 public:
-  	Hanlder(){}
-
-public:
-  	void get(const req_type& request, resp_type& response)
-  	{
-		beast::ostream(response.body()) << data << '\n';
-  	}
-
-  	void post(const req_type& request, resp_type& response)
-  	{
-		data = beast::buffers_to_string(request.body().data());
-	}
-
+    void get(const req_type& request, resp_type& response) { beast::ostream(response.body()) << data << '\n'; }
+    void post(const req_type& request, resp_type& response) { data = beast::buffers_to_string(request.body().data()); }
 private:
-	std::string data;
+    std::string data;
 };
 
 int main(int argc, char* argv[])
