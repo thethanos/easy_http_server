@@ -1,7 +1,6 @@
 #pragma once
 
 #include "router.hpp"
-
 #include <boost/asio/ssl.hpp>
 
 #include <chrono>

@@ -23,7 +23,8 @@ void connection_secure::read_request()
 
     http::async_read(socket, buffer, request, [self](beast::error_code error, size_t bytes){
         boost::ignore_unused(bytes);
-        self->router_ptr->process_request(self->request, self->response);
+        if (!error)
+            self->router_ptr->process_request(self->request, self->response);
         self->write_response();
     });
 }

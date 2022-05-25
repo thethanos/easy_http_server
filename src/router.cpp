@@ -15,12 +15,12 @@ void default_router::process_request(const req_type& request, resp_type& respons
 		return;
 	}
 
-    auto handler = routes[std::string{request.target()}];
-    if (!handler)
-    {
+	auto handler = routes[std::string{request.target()}];
+	if (!handler)
+	{
 		default_handler(request, response);
 		return;
-    }  
+	}  
     
-    handler(request, response);
+	handler(request, response);
 }
