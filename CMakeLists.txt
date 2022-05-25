@@ -18,5 +18,9 @@ find_package(Boost REQUIRED)
 include_directories(Boost_INCLUDE_DIRS)
 target_link_libraries(http_server PRIVATE ${Boost_LIBRARIES})
 
+find_package(OpenSSL REQUIRED)
+include_directories(OPENSSL_INCLUDE_DIR)
+target_link_libraries(http_server PRIVATE OpenSSL::SSL)
+
 find_package(Threads REQUIRED)
 target_link_libraries(http_server PRIVATE Threads::Threads)

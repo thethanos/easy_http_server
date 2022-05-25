@@ -2,7 +2,16 @@
 
 server::server(uint16_t port, size_t thread_count):thread_count(thread_count)
 { 
-    acceptor_ptr = std::make_shared<tcp::acceptor>(context);
+    acceptor_ptr = std::make_shared<tcp::acceptor>(io_ctx);
+
+    tcp::endpoint endpoint(tcp::v4(), port);
+    acceptor_ptr->open(endpoint.protocol());
+    acceptor_ptr->bind(endpoint);
+}
+
+server::server(ssl::context&& ssl_ctx, uint16_t port, size_t thread_count):thread_count(thread_count), ssl_ctx(std::move(ssl_ctx))
+{
+	acceptor_ptr = std::make_shared<tcp::acceptor>(io_ctx);
 
     tcp::endpoint endpoint(tcp::v4(), port);
     acceptor_ptr->open(endpoint.protocol());
@@ -26,23 +35,37 @@ void server::listen_and_serve()
 {
     acceptor_ptr->listen();
     
-    acceptor_ptr->async_accept(socket, [&](std::error_code error) {
+    acceptor_ptr->async_accept(socket, [&](beast::error_code error) {
       if (!error)
-        std::make_shared<http_connection>(std::move(socket), router_ptr)->start();
+        std::make_shared<connection>(std::move(socket), router_ptr, deadline)->start();
       accept_next(acceptor_ptr, socket);
     });
 
     for (size_t i(0); i < thread_count; ++i)
-      boost::asio::post(threads, [this](){ this->context.run();});
+      boost::asio::post(threads, [this](){ this->io_ctx.run();});
 
     threads.join();
 }
 
+void server::listen_and_serve_secure()
+{
+	acceptor_ptr->listen();
+
+	acceptor_ptr->async_accept(socket, [&](beast::error_code error) {
+
+	});
+}
+
 void server::accept_next(std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket)
 {
-    acceptor_ptr->async_accept(socket, [&](std::error_code error) {
+    acceptor_ptr->async_accept(socket, [&](beast::error_code error) {
       if (!error)
-        std::make_shared<http_connection>(std::move(socket), router_ptr)->start();
+        std::make_shared<connection>(std::move(socket), router_ptr, deadline)->start();
       accept_next(acceptor_ptr, socket);
     });
+}
+
+void server::accept_next_secure(std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket)
+{
+
 }
