@@ -66,11 +66,11 @@ int main(int argc, char* argv[])
 {
     Hanlder test;
 
-	ssl::context ssl_ctx(ssl::context::tlsv13_server);
-	ssl_ctx.set_options(ssl::context::default_workarounds | ssl::context::single_dh_use);
-	ssl_ctx.use_certificate_chain_file("/root/tls/intermediate/certs/ca-chain-bundle.pem");
-	ssl_ctx.use_private_key_file("/root/tls/intermediate/private/intermediate.cakey.pem", ssl::context::pem);
-	ssl_ctx.use_tmp_dh_file("/root/tls/dhparams.pem");
+    ssl::context ssl_ctx(ssl::context::tlsv13_server);
+    ssl_ctx.set_options(ssl::context::default_workarounds | ssl::context::single_dh_use);
+    ssl_ctx.use_certificate_chain_file("/root/tls/intermediate/certs/ca-chain-bundle.pem");
+    ssl_ctx.use_private_key_file("/root/tls/intermediate/private/intermediate.cakey.pem", ssl::context::pem);
+    ssl_ctx.use_tmp_dh_file("/root/tls/dhparams.pem");
 
     server srv(std::move(ssl_ctx), 443);
     srv.handle(http::verb::get, "/test", std::bind(&Hanlder::get, &test, std::placeholders::_1, std::placeholders::_2));
