@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-## Example (TLS)
+## Example (TLS):
 ```
 #include "server.hpp"
 
