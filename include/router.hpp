@@ -1,23 +1,12 @@
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/beast/core.hpp>
-#include <boost/beast/http.hpp>
+#include "utility.hpp"
 
-#include <map>
-#include <string>
-#include <functional>
-
-namespace beast = boost::beast;
-namespace http = beast::http;
-
-using req_type = http::request<http::dynamic_body>;
-using resp_type = http::response<http::dynamic_body>;
 
 class abstract_router
 {
 public:
-    virtual void register_handler(http::verb verb, const std::string& path, std::function<void(const req_type&, resp_type&)> handle_func) = 0;
+    virtual void register_handler(http::verb verb, const std::string& path, const route_handler& handle_func) = 0;
     virtual void process_request(const req_type& request, resp_type& response) = 0;
 
 protected:
@@ -26,16 +15,33 @@ protected:
         response.result(http::status::not_found);
         beast::ostream(response.body()) << "Not found\n";
     }
-
-protected:
-    using routes = std::map<std::string, std::function<void(const req_type&, resp_type&)>>;
-
-    std::map<http::verb, routes> verbs;
 };
 
 class default_router : public abstract_router
-{	
+{
+    struct route_node;
+    using node_ptr = std::shared_ptr<route_node>;
+
+    struct route_node
+    {	
+	    route_node(const std::string& node_val, route_handler handler):node_val(node_val), handler(handler){}
+
+	    std::string   node_val;
+	    route_handler handler;
+	    std::vector<node_ptr> nodes;
+    };
+
 public:
-    void register_handler(http::verb verb, const std::string& path, std::function<void(const req_type&, resp_type&)> handle_func) override;
+    default_router();
+
+public:
+    void register_handler(http::verb verb, const std::string& path, const route_handler& handle_func) override;
     void process_request(const req_type& request, resp_type& response) override;
+
+private:
+    void     add_node(node_ptr& parent, const std::vector<std::string>& route, int lvl, const route_handler& handle_func);
+    node_ptr find_route(node_ptr parent, const std::vector<std::string>& route, int lvl);
+
+private:
+    node_ptr root;
 };

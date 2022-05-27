@@ -7,6 +7,8 @@ server::server(uint16_t port, size_t thread_count):thread_count(thread_count)
     tcp::endpoint endpoint(tcp::v4(), port);
     acceptor_ptr->open(endpoint.protocol());
     acceptor_ptr->bind(endpoint);
+
+    router_ptr = std::make_shared<default_router>();
 }
 
 server::server(ssl::context&& ssl_ctx, uint16_t port, size_t thread_count):thread_count(thread_count), ssl_ctx(std::move(ssl_ctx))
@@ -16,17 +18,16 @@ server::server(ssl::context&& ssl_ctx, uint16_t port, size_t thread_count):threa
     tcp::endpoint endpoint(tcp::v4(), port);
     acceptor_ptr->open(endpoint.protocol());
     acceptor_ptr->bind(endpoint);
+
+    router_ptr = std::make_shared<default_router>();
 }
 
-void server::handle(http::verb verb, const std::string& path, std::function<void(const req_type&, resp_type&)> handle_func)
+void server::handle(http::verb verb, const std::string& path, const route_handler& handle_func)
 {
-    if (!router_ptr)
-        router_ptr = std::make_shared<default_router>();
-
     router_ptr->register_handler(verb, path, handle_func);
 }
 
-void server::set_router(std::shared_ptr<abstract_router>& router_ptr)
+void server::set_router(std::shared_ptr<abstract_router> router_ptr)
 {
     this->router_ptr = router_ptr;
 }
