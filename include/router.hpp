@@ -2,6 +2,7 @@
 
 #include "utility.hpp"
 
+#include <map>
 
 class abstract_router
 {
@@ -24,15 +25,16 @@ class default_router : public abstract_router
 
     struct route_node
     {	
-	    route_node(const std::string& node_val, route_handler handler):node_val(node_val), handler(handler){}
+        route_node(){}
+        route_node(const std::string& node_val, route_handler handler):node_val(node_val), handler(handler){}
 
-	    std::string   node_val;
-	    route_handler handler;
-	    std::vector<node_ptr> nodes;
+        std::string   node_val = "/";
+        route_handler handler;
+        std::vector<node_ptr> nodes;
     };
 
 public:
-    default_router();
+    default_router(){}
 
 public:
     void register_handler(http::verb verb, const std::string& path, const route_handler& handle_func) override;
@@ -43,5 +45,5 @@ private:
     node_ptr find_route(node_ptr parent, const std::vector<std::string>& route, int lvl);
 
 private:
-    node_ptr root;
+    std::map<http::verb, node_ptr> routes;
 };
