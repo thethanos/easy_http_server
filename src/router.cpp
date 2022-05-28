@@ -9,6 +9,7 @@ void default_router::register_handler(http::verb verb, const std::string& path, 
     if (path == "/")
     {
         routes[verb]->handler = handle_func;
+        routes[verb]->complete = true;
         return;
     }
 
@@ -20,13 +21,18 @@ void default_router::register_handler(http::verb verb, const std::string& path, 
 
 void default_router::process_request(const req_type& request, resp_type& response)
 {	
+    if (!routes[request.method()])
+    {
+        default_handler(request, response);
+        return;
+    }
+
     if (request.target() == "/")
     {   
-        if (routes[request.method()])
+        if (routes[request.method()]->complete)
             routes[request.method()]->handler(request, response);
         else
             default_handler(request, response);
-            
         return;
     }
 
