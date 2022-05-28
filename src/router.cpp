@@ -1,7 +1,5 @@
 #include "router.hpp"
 
-#include <regex>
-
 
 void default_router::register_handler(http::verb verb, const std::string& path, const route_handler& handle_func) 
 {
@@ -14,11 +12,10 @@ void default_router::register_handler(http::verb verb, const std::string& path, 
         return;
     }
 
-    std::string replaced;
-    std::regex_replace(std::back_inserter(replaced), path.begin(), path.end(), std::regex("\\{\\w*\\}"), "\\w*");
+    auto segments = split_string(path, '/');
+    replace(segments);
 
-    std::vector<std::string> final_path = split_string(replaced, '/');
-    add_node(routes[verb], final_path, 0, handle_func);	
+    add_node(routes[verb]->nodes, {segments.begin()+1, segments.end()}, 0, handle_func);	
 }
 
 void default_router::process_request(const req_type& request, resp_type& response)
@@ -29,13 +26,12 @@ void default_router::process_request(const req_type& request, resp_type& respons
         return;
     }
 
-    std::string path{request.target()};
-    std::string replaced;
-    std::regex_replace(std::back_inserter(replaced), path.begin(), path.end(), std::regex("\\{\\w*\\}"), "\\w*");
+    std::string target{request.target()};
+    std::string path = get_path(target);
 
-    std::vector<std::string> final_path = split_string(replaced, '/');
+    auto segments = split_string(path, '/');
 
-    node_ptr ptr = find_route(routes[request.method()], final_path, 0);
+    node_ptr ptr = find_route(routes[request.method()], {segments.begin()+1, segments.end()}, 0);
     if (ptr == nullptr)
     {	
         default_handler(request, response);
@@ -45,47 +41,51 @@ void default_router::process_request(const req_type& request, resp_type& respons
     ptr->handler(request, response);
 }
 
-void default_router::add_node(node_ptr& parent, const std::vector<std::string>& route, int lvl, const route_handler& handle_func)
+void default_router::add_node(std::vector<node_ptr>& nodes, const std::vector<std::string>& route, int lvl, const route_handler& handle_func)
 {
-    if (parent->node_val == route[route.size()-1])
-    {
-        parent->handler = handle_func;
-        return;
-    }
+    for (auto& node : nodes)
+    {   
+        if (node->node_val == route[lvl] && lvl == route.size()-1)
+        {
+            node->handler = handle_func;
+            node->complete = true;
+            return;
+        }
 
-    for (auto& node : parent->nodes)
-    {
         if (node->node_val == route[lvl])
         {
-            add_node(node, route, lvl+1, handle_func);
+            add_node(node->nodes, route, lvl+1, handle_func);
             return;
         }
     }
 
-    auto new_node = std::make_shared<route_node>(route[lvl], handle_func);
-    parent->nodes.push_back(new_node);
+    auto new_node = std::make_shared<route_node>(route[lvl], handle_func, lvl == route.size()-1?true:false);
+    nodes.push_back(new_node);
     if (lvl < route.size()-1)
-        add_node(new_node, route, lvl+1, handle_func);
+        add_node(new_node->nodes, route, lvl+1, handle_func);
 }
 
 default_router::node_ptr default_router::find_route(node_ptr parent, const std::vector<std::string>& route, int lvl)
 {
     for (auto& node : parent->nodes)
     {
-        if (node->node_val == route[lvl] && lvl == route.size()-1)
+        if (node->node_val == route[lvl] && lvl == route.size()-1 && node->complete)
             return node;
 
-        if (node->node_val == route[lvl])
+        if (node->node_val == route[lvl] && lvl != route.size()-1)
             return find_route(node, route, lvl + 1);
     }
 
     for (auto& node : parent->nodes)
     {	
+        if (route[lvl].empty())
+            continue;
+
         std::regex reg(node->node_val);
-        if (std::regex_match(route[lvl], reg) && lvl == route.size()-1)
+        if (std::regex_match(route[lvl], reg) && lvl == route.size()-1 && node->complete)
             return node;
 
-        if (std::regex_match(route[lvl], reg))
+        if (std::regex_match(route[lvl], reg) && lvl != route.size()-1)
             return find_route(node, route, lvl + 1);
     }
 

@@ -26,11 +26,13 @@ class default_router : public abstract_router
     struct route_node
     {	
         route_node(){}
-        route_node(const std::string& node_val, route_handler handler):node_val(node_val), handler(handler){}
+        route_node(const std::string& node_val, route_handler handler, bool complete = false)
+            :node_val(node_val), handler(handler), complete(complete){}
 
         std::string   node_val = "/";
         route_handler handler;
         std::vector<node_ptr> nodes;
+        bool complete;
     };
 
 public:
@@ -41,7 +43,7 @@ public:
     void process_request(const req_type& request, resp_type& response) override;
 
 private:
-    void     add_node(node_ptr& parent, const std::vector<std::string>& route, int lvl, const route_handler& handle_func);
+    void     add_node(std::vector<node_ptr>& nodes, const std::vector<std::string>& route, int lvl, const route_handler& handle_func);
     node_ptr find_route(node_ptr parent, const std::vector<std::string>& route, int lvl);
 
 private:
