@@ -21,8 +21,12 @@ void default_router::register_handler(http::verb verb, const std::string& path, 
 void default_router::process_request(const req_type& request, resp_type& response)
 {	
     if (request.target() == "/")
-    {
-        routes[request.method()]->handler(request, response);
+    {   
+        if (routes[request.method()])
+            routes[request.method()]->handler(request, response);
+        else
+            default_handler(request, response);
+            
         return;
     }
 
