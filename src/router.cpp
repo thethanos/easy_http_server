@@ -4,7 +4,7 @@
 void default_router::register_handler(http::verb verb, const std::string& path, const route_handler& handle_func) 
 {
     if (!routes[verb])
-        routes[verb] = std::make_shared<route_node>();
+        routes[verb] = std::make_shared<route_node>("/", std::bind(&default_router::default_handler, this, _1, _2));
 
     if (path == "/")
     {
@@ -29,10 +29,7 @@ void default_router::process_request(const req_type& request, resp_type& respons
 
     if (request.target() == "/")
     {   
-        if (routes[request.method()]->complete)
-            routes[request.method()]->handler(request, response);
-        else
-            default_handler(request, response);
+        routes[request.method()]->handler(request, response);
         return;
     }
 
@@ -69,10 +66,16 @@ void default_router::add_node(std::vector<node_ptr>& nodes, const std::vector<st
         }
     }
 
-    auto new_node = std::make_shared<route_node>(route[lvl], handle_func, lvl == route.size()-1?true:false);
+    if (lvl == route.size()-1)
+    {
+        nodes.push_back(std::make_shared<route_node>(route[lvl], handle_func, true));
+        return;
+    }
+
+    auto new_node = std::make_shared<route_node>(route[lvl], std::bind(&default_router::default_handler, this, _1, _2));
     nodes.push_back(new_node);
-    if (lvl < route.size()-1)
-        add_node(new_node->nodes, route, lvl+1, handle_func);
+    
+    add_node(new_node->nodes, route, lvl+1, handle_func);
 }
 
 default_router::node_ptr default_router::find_route(node_ptr parent, const std::vector<std::string>& route, int lvl)
