@@ -13,8 +13,8 @@ void default_router::register_handler(http::verb verb, const std::string& path, 
         return;
     }
 
-    auto segments = split_string(path, '/');
-    replace(segments);
+    auto segments = util::split_string(path, '/');
+    util::replace(segments);
 
     add_node(routes[verb]->nodes, {segments.begin()+1, segments.end()}, 0, handle_func);	
 }
@@ -27,16 +27,16 @@ void default_router::process_request(const req_type& request, resp_type& respons
         return;
     }
 
-    if (request.target() == "/")
+    if (http::get_path(request.target().to_string()) == "/")
     {   
         routes[request.method()]->handler(request, response);
         return;
     }
 
     std::string target{request.target()};
-    std::string path = get_path(target);
+    std::string path = http::get_path(target);
 
-    auto segments = split_string(path, '/');
+    auto segments = util::split_string(path, '/');
 
     node_ptr ptr = find_route(routes[request.method()], {segments.begin()+1, segments.end()}, 0);
     if (ptr == nullptr)
