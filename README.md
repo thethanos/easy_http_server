@@ -19,8 +19,8 @@ int main(int argc, char* argv[])
     Hanlder test;
 
     server srv(8080);
-    srv.handle(http::verb::get, "/test/{id}", std::bind(&Hanlder::get, &test, std::placeholders::_1, std::placeholders::_2));
-    srv.handle(http::verb::post, "/test", std::bind(&Hanlder::post, &test, std::placeholders::_1, std::placeholders::_2));
+    srv.handle(http::verb::get, "/test/{id}", std::bind(&Hanlder::get, &test, _1, _2));
+    srv.handle(http::verb::post, "/test", std::bind(&Hanlder::post, &test, _1, _2));
     srv.listen_and_serve();
 
     return 0;
@@ -51,8 +51,8 @@ int main(int argc, char* argv[])
     ssl_ctx.use_tmp_dh_file("/root/tls/dhparams.pem");
 
     server srv(std::move(ssl_ctx), 443);
-    srv.handle(http::verb::get, "/test/{id}", std::bind(&Hanlder::get, &test, std::placeholders::_1, std::placeholders::_2));
-    srv.handle(http::verb::post, "/test", std::bind(&Hanlder::post, &test, std::placeholders::_1, std::placeholders::_2));
+    srv.handle(http::verb::get, "/test", std::bind(&Hanlder::get, &test, _1, _2));
+    srv.handle(http::verb::post, "/test", std::bind(&Hanlder::post, &test, _1, _2));
     srv.listen_and_serve_secure();
 
     return 0;
