@@ -1,6 +1,22 @@
 ## Dependencies (See Dockerfile for more information):
 > Boost, OpenSSL
 
+## How to use in your project:
+```
+cmake_minimum_required(VERSION 3.0.0)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+project(your_project)
+
+add_executable(example main.cpp)
+
+add_subdirectory(deps/easy_http_server)
+include_directories(deps/easy_http_server/ehs/include)
+target_link_libraries(example PRIVATE ehs)
+```
+
 ## Example (no TLS):
 ```
 #include "server.hpp"
