@@ -27,14 +27,13 @@ void default_router::process_request(const req_type& request, resp_type& respons
         return;
     }
 
-    if (http::get_path(request.target().to_string()) == "/")
+    if (http::get_target_path(request.target()) == "/")
     {   
         routes[request.method()]->handler(request, response);
         return;
     }
 
-    std::string target{request.target()};
-    std::string path = http::get_path(target);
+    std::string path = http::get_target_path(request.target());
 
     auto segments = util::split_string(path, '/');
 

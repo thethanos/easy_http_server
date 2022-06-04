@@ -11,12 +11,12 @@ public:
     void get(const req_type& request, resp_type& response)
     {
         beast::ostream(response.body()) 
-            << "Path: " << http::get_path(request.target().to_string()) 
+            << "Path: " << http::get_path(request.target()) 
             << '\n'
-            << "ID: " << util::split_string(http::get_path(request.target().to_string()), '/')[2]
+            << "ID: " << util::split_string(http::get_path(request.target()), '/')[2]
             << '\n';
         
-        auto query = http::parse_query(http::get_query(request.target().to_string()));
+        auto query = http::parse_query(http::get_query(request.target()));
 
         for (auto& pair : query)
             beast::ostream(response.body()) << "Key: " << pair.first << " value: " << pair.second << '\n';

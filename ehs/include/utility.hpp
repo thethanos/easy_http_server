@@ -17,24 +17,6 @@ using std::placeholders::_2;
 
 namespace util
 {
-	inline std::string parse_target(const std::string& path, bool flag)
-	{
-		std::cmatch res;
-		std::regex expr("(/?[^ #?]*)\\x3f?([^ #]*)#?([^ ]*)");
-
-		std::string result_path, result_query;
-		if(std::regex_match(path.c_str(), res, expr)) 
-		{
-			result_path = std::string(res[1].first, res[1].second);
-			result_query = std::string(res[2].first, res[2].second);
-		}
-
-		if (flag)
-			return result_path;
-		else
-			return result_query;
-	}
-
 	//split string into a vector
 	inline std::vector<std::string> split_string(const std::string& str, char delim)
 	{
@@ -67,11 +49,22 @@ namespace http
 {	
 	using namespace beast::http;
 
-	// get path from target
-	inline auto get_path = std::bind(util::parse_target, _1, true);
+	// get path from the target
+    inline std::string get_target_path(const beast::string_view& target)
+    {   
+        size_t pos = target.find('?');
+        return std::string{target.substr(0, pos)};
+    }
 
-	//get query from target
-	inline auto get_query = std::bind(util::parse_target, _1, false);
+	//get query from the target
+    inline std::string get_target_query(const beast::string_view& target)
+    {
+        size_t pos = target.find('?');
+        if (pos == std::string::npos)
+            return "";
+			
+        return std::string{target.substr(++pos)};
+    }
 
 	inline std::map<std::string, std::string> parse_query(const std::string& query)
 	{
