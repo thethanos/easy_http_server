@@ -1,4 +1,5 @@
-#include "test_utility.hpp"
+#include "router_test.hpp"
+#include "utility_test.hpp"
 
 int main(int argc, char** argv)
 {   
