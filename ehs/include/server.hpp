@@ -3,7 +3,6 @@
 #include "connection.hpp"
 #include "connection_secure.hpp"
 
-
 class server
 {
 public:
@@ -22,10 +21,10 @@ public:
     void set_deadline(const int64_t& deadline) { this->deadline = deadline; }
 
     // start accepting http connections
-    void listen_and_serve();
+    void listen_and_serve(const std::stop_token& token);
 
     // start accepting https connections
-    void listen_and_serve_secure();
+    void listen_and_serve_secure(const std::stop_token& token);
 
 private:
     net::io_context io_ctx;
@@ -42,6 +41,7 @@ private:
     ssl::context ssl_ctx{ssl::context::sslv23};
 
 private:
-    void accept_next(std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket);
-    void accept_next_secure(std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket);
+    void wait_for_stop_token(const std::stop_token& token);
+    void accept_next(const std::stop_token& token, std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket);
+    void accept_next_secure(const std::stop_token& token, std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket);
 };

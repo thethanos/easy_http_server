@@ -32,42 +32,63 @@ void server::set_router(std::shared_ptr<abstract_router> router_ptr)
     this->router_ptr = router_ptr;
 }
 
-void server::listen_and_serve()
+void server::listen_and_serve(const std::stop_token& token)
 {
     acceptor_ptr->listen();
-    accept_next(acceptor_ptr, socket);
+    accept_next(token, acceptor_ptr, socket);
 
     for (size_t i(0); i < thread_count; ++i)
         boost::asio::post(threads, [this](){ this->io_ctx.run();});
 
+    boost::asio::post(std::bind(&server::wait_for_stop_token, this, token));
     threads.join();
 }
 
-void server::listen_and_serve_secure()
+void server::listen_and_serve_secure(const std::stop_token& token)
 {
     acceptor_ptr->listen();
-    accept_next_secure(acceptor_ptr, socket);
+    accept_next_secure(token, acceptor_ptr, socket);
 
     for (size_t i(0); i < thread_count; ++i)
         boost::asio::post(threads, [this](){ this->io_ctx.run(); });
 	
+    boost::asio::post(std::bind(&server::wait_for_stop_token, this, token));
     threads.join();
 }
 
-void server::accept_next(std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket)
+void server::wait_for_stop_token(const std::stop_token& token)
+{
+    if (token.stop_requested())
+    {
+        io_ctx.stop();
+        return;
+    }
+    
+    boost::asio::post(std::bind(&server::wait_for_stop_token, this, token));
+}
+
+void server::accept_next(const std::stop_token& token, std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket)
 {
     acceptor_ptr->async_accept(socket, [&](beast::error_code error) {
+
+        if (token.stop_requested())
+            return;
+
         if (!error)
             std::make_shared<connection>(std::move(socket), router_ptr, deadline)->start();
-        accept_next(acceptor_ptr, socket);
+        accept_next(token, acceptor_ptr, socket);
     });
 }
 
-void server::accept_next_secure(std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket)
+void server::accept_next_secure(const std::stop_token& token, std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket)
 {
     acceptor_ptr->async_accept(socket, [&](beast::error_code error) {
+
+        if (token.stop_requested())
+            return;
+
         if (!error)
             std::make_shared<connection_secure>(ssl_ctx, std::move(socket), router_ptr, deadline)->start();
-        accept_next_secure(acceptor_ptr, socket);
+        accept_next_secure(token, acceptor_ptr, socket);
     });
 }
