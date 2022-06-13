@@ -46,11 +46,12 @@ private:
 int main(int argc, char* argv[])
 {
     Hanlder test;
+    std::stop_source source;
 
     server srv(8080);
     srv.handle(http::verb::get, "/test/{id}", std::bind(&Hanlder::get, &test, _1, _2));
     srv.handle(http::verb::post, "/test", std::bind(&Hanlder::post, &test, _1, _2));
-    srv.listen_and_serve();
+    srv.listen_and_serve(source.get_token());
 
     return 0;
 }
@@ -67,5 +68,5 @@ int main(int argc, char* argv[])
     server srv(std::move(ssl_ctx), 443);
     srv.handle(http::verb::get, "/test/{id}", std::bind(&Hanlder::get, &test, _1, _2));
     srv.handle(http::verb::post, "/test", std::bind(&Hanlder::post, &test, _1, _2));
-    srv.listen_and_serve_secure();
+    srv.listen_and_serve_secure(source.get_token());
 ```
