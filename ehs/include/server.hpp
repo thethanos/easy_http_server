@@ -11,13 +11,14 @@ public:
     ~server(){}
 
 public:
-    // handle the given path (accepts any callable objects)
+    // handle the given path
+    // accepts any callable objects satisfying following signature: void (const req_type &, resp_type &)
     void handle(http::verb verb, const std::string& path, const route_handler& handle_func);
 
     // set a new router
     void set_router(std::shared_ptr<abstract_router> router_ptr);
 
-    // set deadline (relatively to now())
+    // set deadline (relative to now())
     void set_deadline(const int64_t& deadline) { this->deadline = deadline; }
 
     // start accepting http connections
