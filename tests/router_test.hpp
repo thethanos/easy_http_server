@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 const unsigned int HTTP_VERSION = 11;
 
 class RouterTest : public ::testing::Test 
