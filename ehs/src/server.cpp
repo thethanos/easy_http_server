@@ -7,6 +7,7 @@ server::server(uint16_t port, size_t thread_count):thread_count(thread_count)
     tcp::endpoint endpoint(tcp::v4(), port);
     acceptor_ptr->open(endpoint.protocol());
     acceptor_ptr->bind(endpoint);
+    acceptor_ptr->set_option(boost::asio::socket_base::reuse_address(true));
 
     router_ptr = std::make_shared<default_router>();
 }
@@ -18,6 +19,7 @@ server::server(ssl::context&& ssl_ctx, uint16_t port, size_t thread_count):threa
     tcp::endpoint endpoint(tcp::v4(), port);
     acceptor_ptr->open(endpoint.protocol());
     acceptor_ptr->bind(endpoint);
+    acceptor_ptr->set_option(boost::asio::socket_base::reuse_address(true));
 
     router_ptr = std::make_shared<default_router>();
 }
