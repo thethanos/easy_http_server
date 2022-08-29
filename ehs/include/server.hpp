@@ -3,6 +3,8 @@
 #include "connection.hpp"
 #include "connection_secure.hpp"
 
+#include <optional>
+
 class server
 {
 public:
@@ -39,7 +41,7 @@ private:
     
     int64_t deadline = 60;
 
-    ssl::context ssl_ctx{ssl::context::sslv23};
+    std::optional<ssl::context> ssl_ctx;
 
 private:
     void wait_for_stop_token(const std::stop_token& token);

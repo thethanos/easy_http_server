@@ -12,8 +12,9 @@ server::server(uint16_t port, size_t thread_count):thread_count(thread_count)
     router_ptr = std::make_shared<default_router>();
 }
 
-server::server(ssl::context&& ssl_ctx, uint16_t port, size_t thread_count):thread_count(thread_count), ssl_ctx(std::move(ssl_ctx))
-{
+server::server(ssl::context&& ssl_ctx, uint16_t port, size_t thread_count):thread_count(thread_count)
+{   
+    this->ssl_ctx.emplace(std::move(ssl_ctx));
     acceptor_ptr = std::make_shared<tcp::acceptor>(io_ctx);
 
     tcp::endpoint endpoint(tcp::v4(), port);
@@ -90,7 +91,7 @@ void server::accept_next_secure(const std::stop_token& token, std::shared_ptr<tc
             return;
 
         if (!error)
-            std::make_shared<connection_secure>(ssl_ctx, std::move(socket), router_ptr, deadline)->start();
+            std::make_shared<connection_secure>(ssl_ctx.value(), std::move(socket), router_ptr, deadline)->start();
         accept_next_secure(token, acceptor_ptr, socket);
     });
 }
