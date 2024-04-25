@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:23.04
 
 RUN apt update && \
     apt install -y software-properties-common && \

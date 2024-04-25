@@ -1,6 +1,15 @@
 ## Dependencies (See Dockerfile for more information):
 > Boost, OpenSSL
 
+## How to install
+```
+mkdir build
+cd build
+cmake ..
+make
+make install
+```
+
 ## How to use in your project:
 ```
 cmake_minimum_required(VERSION 3.0.0)
@@ -17,7 +26,7 @@ include_directories(deps/easy_http_server/ehs/include)
 target_link_libraries(example PRIVATE ehs)
 ```
 
-## Example (no TLS):
+## See examples folder
 ```
 #include "server.hpp"
 

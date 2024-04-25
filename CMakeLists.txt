@@ -1,14 +1,35 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
+project(ehs)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(easy_http_server)
+include_directories(include)
+aux_source_directory(src SOURCES)
 
-include_directories(ehs/include)
+add_library(${PROJECT_NAME} ${SOURCES})
 
-add_subdirectory(ehs)
-add_subdirectory(tests)
-add_subdirectory(deps/googletest)
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+
+find_package(Boost REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(Threads REQUIRED)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    Boost_INCLUDE_DIRS
+    OPENSSL_INCLUDE_DIR
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${Boost_LIBRARIES}
+    OpenSSL::SSL
+    Threads::Threads
+)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ 
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/include/ehs 
+    FILES_MATCHING PATTERN *.hpp
+)
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME})
+install(EXPORT ${PROJECT_NAME} FILE ehs-config.cmake DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME})
