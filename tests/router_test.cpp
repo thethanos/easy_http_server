@@ -1,8 +1,8 @@
-#pragma once
-
-#include "router.hpp"
+#include <ehs/router.hpp>
 
 #include <gtest/gtest.h>
+
+using namespace ehs;
 
 const unsigned int HTTP_VERSION = 11;
 

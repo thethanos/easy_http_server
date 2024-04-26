@@ -1,5 +1,7 @@
 #include <ehs/server.hpp>
 
+using namespace ehs;
+
 class Hanlder
 {
 public:

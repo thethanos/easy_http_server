@@ -5,6 +5,8 @@
 
 #include <optional>
 
+namespace ehs {
+
 class server
 {
 public:
@@ -48,3 +50,5 @@ private:
     void accept_next(const std::stop_token& token, std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket);
     void accept_next_secure(const std::stop_token& token, std::shared_ptr<tcp::acceptor>& acceptor_ptr, tcp::socket& socket);
 };
+
+}

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "utility.hpp"
+#include "util.hpp"
 
 #include <map>
+
+namespace ehs {
 
 class abstract_router
 {
@@ -49,3 +51,5 @@ private:
 private:
     std::map<http::verb, node_ptr> routes;
 };
+
+}

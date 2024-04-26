@@ -1,8 +1,8 @@
-#pragma once
-
-#include "utility.hpp"
+#include <ehs/util.hpp>
 
 #include <gtest/gtest.h>
+
+using namespace ehs;
 
 TEST(utility, split_string)
 {

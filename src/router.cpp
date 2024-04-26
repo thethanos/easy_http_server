@@ -1,5 +1,6 @@
 #include "router.hpp"
 
+namespace ehs {
 
 void default_router::register_handler(http::verb verb, const std::string& path, const route_handler& handle_func) 
 {
@@ -102,4 +103,6 @@ default_router::node_ptr default_router::find_route(node_ptr parent, const std::
     }
 
     return nullptr;
+}
+
 }

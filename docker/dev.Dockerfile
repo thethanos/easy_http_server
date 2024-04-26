@@ -1,7 +1,9 @@
 FROM ubuntu:23.04
 
 RUN apt update && \
-    apt install -y software-properties-common && \
-    add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
-    apt install -y g++-11 cmake libboost-all-dev libssl-dev git cppcheck cmake && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 100
+    apt install -y cmake g++-11 gcc-11 && \
+    libboost-all-dev libssl-dev libgtest-dev && \
+    cppcheck gdb
+
+ENV CC=/usr/bin/gcc-11
+ENV CXX=/usr/bin/g++-11

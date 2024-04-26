@@ -5,6 +5,8 @@
 #include <chrono>
 #include <memory>
 
+namespace ehs {
+
 namespace net = boost::asio;
 
 using tcp = boost::asio::ip::tcp;
@@ -39,3 +41,5 @@ private:
 
     int64_t deadline;
 };
+
+}

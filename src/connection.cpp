@@ -1,5 +1,7 @@
 #include "connection.hpp"
 
+namespace ehs {
+
 connection::connection(tcp::socket&& socket, std::shared_ptr<abstract_router> router_ptr, int64_t deadline)
     :socket(std::move(socket)), timer(socket.get_executor(), std::chrono::seconds(deadline))
 { 
@@ -26,7 +28,7 @@ void connection::write_response()
     response.content_length(response.body().size());
 
     http::async_write(socket, response, [self](beast::error_code error, size_t size){
-        self->socket.shutdown(tcp::socket::shutdown_send, error);
+        self->socket.shutdown(boost::asio::socket_base::shutdown_both);
         self->timer.cancel();
     });
 }
@@ -39,4 +41,6 @@ void connection::check_deadline()
         if (!error)
             self->socket.close(error);
     });
+}
+
 }

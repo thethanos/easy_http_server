@@ -10,6 +10,8 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
+namespace ehs {
+
 namespace beast = boost::beast;
 
 using std::placeholders::_1;
@@ -93,3 +95,5 @@ namespace http
 using req_type  = http::request<http::dynamic_body>;
 using resp_type = http::response<http::dynamic_body>;
 using route_handler = std::function<void(const req_type&, resp_type&)>;
+
+}

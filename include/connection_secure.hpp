@@ -9,6 +9,8 @@
 namespace net = boost::asio;
 namespace ssl = boost::asio::ssl;
 
+namespace ehs::secure {
+
 using tcp = boost::asio::ip::tcp;
 
 class connection_secure : public std::enable_shared_from_this<connection_secure>
@@ -42,3 +44,5 @@ private:
 
     int64_t deadline;
 };
+
+} //ehs::ssl

@@ -1,5 +1,7 @@
 #include <ehs/server.hpp>
 
+using namespace ehs;
+
 class Hanlder
 {
 public:
@@ -28,7 +30,9 @@ int main(int argc, char* argv[])
     std::stop_source source;
 
     ssl::context ssl_ctx(ssl::context::tlsv13_server);
-    //ssl_ctx.use_certificate_file("certificate.crt");
+    ssl_ctx.use_certificate_file("dev-full.crt", ssl::context_base::pem);
+    ssl_ctx.use_private_key_file("dev-key.key", ssl::context_base::pem);
+    
 
     server srv(std::move(ssl_ctx), 443);
     srv.handle(http::verb::get, "/test/{id}", std::bind(&Hanlder::get, &test, _1, _2));

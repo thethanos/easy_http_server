@@ -1,5 +1,7 @@
 #include "server.hpp"
 
+namespace ehs {
+
 server::server(uint16_t port, size_t thread_count):thread_count(thread_count)
 { 
     acceptor_ptr = std::make_shared<tcp::acceptor>(io_ctx);
@@ -91,7 +93,9 @@ void server::accept_next_secure(const std::stop_token& token, std::shared_ptr<tc
             return;
 
         if (!error)
-            std::make_shared<connection_secure>(ssl_ctx.value(), std::move(socket), router_ptr, deadline)->start();
+            std::make_shared<secure::connection_secure>(ssl_ctx.value(), std::move(socket), router_ptr, deadline)->start();
         accept_next_secure(token, acceptor_ptr, socket);
     });
+}
+
 }

@@ -1,5 +1,7 @@
 #include "connection_secure.hpp"
 
+namespace ehs::secure {
+
 connection_secure::connection_secure(ssl::context& ssl_ctx, tcp::socket&& socket, std::shared_ptr<abstract_router> router_ptr, int64_t deadline)
     :socket(std::move(socket), ssl_ctx), timer(socket.get_executor(), std::chrono::seconds(deadline)) 
 {
@@ -36,8 +38,9 @@ void connection_secure::write_response()
     response.content_length(response.body().size());
 
     http::async_write(socket, response, [self](beast::error_code error, size_t size){
-        self->socket.shutdown();
-        self->timer.cancel();
+       self->socket.async_shutdown([self](const boost::system::error_code& ec) {
+            self->timer.cancel();
+        });
     });
 }
 
@@ -49,4 +52,6 @@ void connection_secure::check_deadline()
         if (!error)
             self->socket.lowest_layer().close(error);
     });
+}
+
 }
